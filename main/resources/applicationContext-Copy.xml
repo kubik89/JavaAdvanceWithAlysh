@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:property-placeholder location="classpath:musicPlayer.properties"/>
+
+    <!--вказую, що створюю новий обєкт id musicBean яким є типу ClassicalMusic й посилається на нього-->
+    <bean id="musicBeanRock"
+          class="org.example.RockMusic"
+          scope="prototype"
+          init-method="doMyInit"
+          destroy-method="doMyDestroy">
+    </bean>
+    <bean id="musicBeanClassical"
+          class="org.example.ClassicalMusic"
+          init-method="doMyInit"
+          destroy-method="doMyDestroy">
+    </bean>
+
+    <!--вказую, що створюю новий обєкт id musicPlayer (потребує аргументів в дужках конструктора) й -->
+    <!--передаю як аргументи обєкт іншого класу musicBean-->
+    <!--таким чином це Spring автоматично створить всі обєкти замість наших дій вручну-->
+    <bean id="musicPlayer"
+          class="org.example.MusicPlayer">
+        <!-- для використання конструктора як аргументу в ref прокидуємо значення-->
+        <!--            <constructor-arg ref="musicBean" />-->
+
+        <!-- використання set-ера в property ="" SPRING шукає метод setMusic, але зибарає з нього слово set
+            і першу літеру робить малою-->
+        <!--        <property name="music" ref="musicBean"/>-->
+        <!--        <property name="musicList" ref="musicBean"/>-->
+        <property name="musicList">
+            <list>
+                <ref bean="musicBeanRock"/>
+                <ref bean="musicBeanClassical"/>
+            </list>
+        </property>
+        <property name="name" value="${musicPlayer.name}"/>
+        <property name="volume" value="${musicPlayer.volume}"/>
+    </bean>
+
+    <!-- scope="prototype" посилається на РІЗНІ обєкти, створює їх відповідно до кількості викликів цих обєктів.   -->
+    <!--    якщо без scope - по замовчуванні тут лежить під капотом scope="singleton" - посилається на ТОЙ САМИЙ
+            перший обєкт, навіть якщо їх декілька.-->
+    <bean id="car"
+          class="org.example.Car"
+          factory-method="createNewCar">
+    </bean>
+
+    <!--    <bean id="musicPlayer"-->
+    <!--          class="org.example.MusicPlayer">-->
+    <!--        <property name="musicList" ref="musicBean1"/>-->
+    <!--    </bean>-->
+
+</beans>
